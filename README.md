@@ -1,4 +1,4 @@
-# ParLiR
+# ParLiR - A Test Collection for Information Retrieval over Portuguese Parliamentary Initiatives
 
 Submitted to ECIR2027
 
