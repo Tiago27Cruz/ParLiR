@@ -2,6 +2,14 @@
 
 Submitted to ECIR2027
 
+## Data
+
+The data with the initiatives and its metadata (see ``/data/corpus/legislature_xvi.ttl``) comes from the [Portuguese Parliament's open data section](https://www.parlamento.pt/Cidadania/Paginas/DadosAbertos.aspx).
+
+The data is free to use, as long as the [source](https://www.parlamento.pt/Cidadania/Paginas/DadosAbertos.aspx) is mentioned.
+
+
+
 ## Running the Code
 
 All the source code can be found under ``/src``.
