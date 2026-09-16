@@ -1,0 +1,13 @@
+[project]
+name = "parlir"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "accelerate>=1.15.0",
+    "ranx>=0.3.21",
+    "rdflib>=7.6.0",
+    "scikit-learn>=1.9.1",
+    "transformers>=5.17.0",
+]
