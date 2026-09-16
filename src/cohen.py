@@ -13,5 +13,5 @@ def compute_kappa(csv_path: str) -> float:
 
 
 if __name__ == "__main__":
-    kappa: float = compute_kappa("out/iaa.csv")
+    kappa: float = compute_kappa("../data/iaa/iaa.csv")
     print(f"Cohen's κ = {kappa:.4f}")

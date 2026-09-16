@@ -7,3 +7,15 @@ Submitted to ECIR2027
 All the source code can be found under ``/src``.
 
 Run ``uv sync`` and then, under ``/src``, run ``uv run <name>.py``.
+
+### Structure
+
+- **qrels.py**: Creates the QRELS files and saves them. Includes the ``train_test_split`` code to divide the QRELS.
+
+- **iaa.py**: Creates stratified Query-Initiative pairs and prompts a local Qwen3-8B LLM to evaluate if the initiative is relevant using a structured prompt with all the initiative metadata and text, along with the query's information need and narrative.
+
+- **evaluation.py**: Calculates the metrics used for evaluation using ``ranx``.
+
+- **cohen.py**: Calculates κ based on the values in ``data/iaa/iaa.csv``, which are created by ``iaa.py``
+
+- **distribution.ipynb**: Creates the lineplot used in the paper.
