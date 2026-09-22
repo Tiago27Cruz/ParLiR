@@ -8,13 +8,11 @@ The data with the initiatives and its metadata (see ``/data/corpus/legislature_x
 
 The data is free to use, as long as the [source](https://www.parlamento.pt/Cidadania/Paginas/DadosAbertos.aspx) is mentioned.
 
-
-
 ## Running the Code
 
-All the source code can be found under ``/src``.
+All the source code can be found under ``/scripts``.
 
-Run ``uv sync`` and then, under ``/src``, run ``uv run <name>.py``.
+Run ``uv sync`` and then run ``uv run .\scripts\<name>.py``.
 
 ### Structure
 

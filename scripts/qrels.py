@@ -1,5 +1,6 @@
 from sklearn.model_selection import train_test_split
 from ranx import Qrels
+from statistics import median
 
 def split_queries_train_test(test_size=0.2, random_state=42):
     queries_map = get_queries_variations()
@@ -640,7 +641,7 @@ def create_dataset():
         f.write(content)
     qrels.save("out/qrels_test.parquet")
             
-from statistics import median
+
 def get_median_correct_per_IN():
     counts = [len(get_correct_uris(i)) for i in range(30)]
     print(median(counts))
