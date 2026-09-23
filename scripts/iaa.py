@@ -6,17 +6,20 @@ import xml.etree.ElementTree as ET
 from typing import Dict, List, Set, TypedDict
 import torch
 import re
+from pathlib import Path
 
 POLIS_INI = Namespace("http://purl.org/polis/ar/initiatives#")
 BIBO = Namespace("http://purl.org/ontology/bibo/")
-QRELS_PATH: str = "../data/qrels/qrels_test.trec"
-TOPICS_PATH: str = "../data/queries/topics.xml"
+BASE_DIR: Path = Path(__file__).resolve().parent.parent
+QRELS_PATH: Path = BASE_DIR / "data/qrels/qrels_test.trec"
+TOPICS_PATH: Path = BASE_DIR / "data/queries/topics.xml"
 
 
 def get_initiatives() -> dict:
 
     g = Graph()
-    g.parse("data/corpus/legislature_xvi.ttl")
+    g.parse(BASE_DIR / "data/corpus/legislature_xvi.ttl")
+    g.parse(BASE_DIR / "data/corpus/initiatives.ttl")
 
     q = """
     PREFIX foaf: <http://xmlns.com/foaf/0.1/>
@@ -124,8 +127,7 @@ Do not output <think>.
             response,
             flags=re.DOTALL
         ).strip()
-        print(f"{pair['doc_id']} -- AI: {response} | Tiago {pair['relevance']}")
-        with open("out/iaa.csv", '+a') as f:
+        with open(BASE_DIR / "scripts/out/iaa.csv", '+a') as f:
             f.write(f"{pair['doc_id']},{response},{pair['relevance']}\n")
 
 class QueryInfo(TypedDict):
@@ -147,7 +149,7 @@ class Pair(TypedDict):
     desc: str
     narr: str
 
-def load_topics(path: str) -> Dict[str, QueryInfo]:
+def load_topics(path: Path) -> Dict[str, QueryInfo]:
     tree = ET.parse(path)
     root = tree.getroot()
 
@@ -166,7 +168,7 @@ def load_topics(path: str) -> Dict[str, QueryInfo]:
 
     return topics
 
-def load_qrels(path: str) -> Dict[str, Set[str]]:
+def load_qrels(path: Path) -> Dict[str, Set[str]]:
     relevant_docs: Dict[str, Set[str]] = {}
 
     with open(path, encoding="utf-8") as f:
@@ -198,16 +200,13 @@ def sample_pairs(topics: Dict[str, QueryInfo],relevant_docs: Dict[str, Set[str]]
         if int(q.split('-')[0]) in metadata_ins
     ]
 
-    selected_lexical_rel: List[str] = rng.sample(lexical_queries,  6)
-
+    selected_lexical_rel: List[str] = rng.sample(lexical_queries, 6)
     remaining_lexical: List[str] = [ q for q in lexical_queries if q not in selected_lexical_rel]
 
-    selected_lexical_nonrel: List[str] = rng.sample(  remaining_lexical,6 )
-
-    selected_metadata_rel: List[str] = rng.sample( metadata_queries,6)
+    selected_lexical_nonrel: List[str] = rng.sample(remaining_lexical,6)
+    selected_metadata_rel: List[str] = rng.sample(metadata_queries,6)
 
     remaining_metadata: List[str] = [q for q in metadata_queries if q not in selected_metadata_rel  ]
-
     selected_metadata_nonrel: List[str] = rng.sample(remaining_metadata, 6)
 
     pairs: List[Pair] = []
@@ -216,11 +215,9 @@ def sample_pairs(topics: Dict[str, QueryInfo],relevant_docs: Dict[str, Set[str]]
     # lexical + relevant
     #
     for qid in selected_lexical_rel:
-
-        doc_id: str = rng.choice(
-            list(relevant_docs[qid])
-        )
-
+    
+        doc_id: str = rng.choice(list(relevant_docs[qid]))
+    
         pairs.append({
             "query_id": qid,
             "query_type": "lexical",
@@ -240,13 +237,9 @@ def sample_pairs(topics: Dict[str, QueryInfo],relevant_docs: Dict[str, Set[str]]
     #
     for qid in selected_lexical_nonrel:
 
-        non_relevant_pool: List[str] = list(
-            all_docs - relevant_docs[qid]
-        )
+        non_relevant_pool: List[str] = list(all_docs - relevant_docs[qid])
 
-        doc_id: str = rng.choice(
-            non_relevant_pool
-        )
+        doc_id: str = rng.choice(non_relevant_pool)
 
         pairs.append({
             "query_id": qid,
@@ -319,6 +312,8 @@ if __name__ == "__main__":
     print(torch.cuda.is_available())
     topics = load_topics(TOPICS_PATH)
     relevant_docs = load_qrels(QRELS_PATH)
+    initiatives = get_initiatives()
+    print(len(initiatives))
 
-    pairs = sample_pairs(topics,relevant_docs,get_initiatives())
+    pairs = sample_pairs(topics,relevant_docs,initiatives)
     get_ia_labels(pairs)
