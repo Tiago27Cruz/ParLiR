@@ -2,26 +2,48 @@
 
 Submitted to ECIR2027
 
-## Data
+## Dataset
 
-The data with the initiatives and its metadata (see ``/data/corpus/legislature_xvi.ttl``) comes from the [Portuguese Parliament's open data section](https://www.parlamento.pt/Cidadania/Paginas/DadosAbertos.aspx).
+The parliamentary initiatives and associated metadata provided in ``data/corpus/legislature_xvi.ttl`` were collected from the official [Portuguese Parliament's open data section](https://www.parlamento.pt/Cidadania/Paginas/DadosAbertos.aspx).
 
-The data is free to use, as long as the [source](https://www.parlamento.pt/Cidadania/Paginas/DadosAbertos.aspx) is mentioned.
+The dataset is distributed in accordance with the terms established by the Portuguese Parliament. Users are requested to acknowledge the original [source](https://www.parlamento.pt/Cidadania/Paginas/DadosAbertos.aspx) when reusing the data.
 
-## Running the Code
+All dataset resources are located under the ``data/`` directory.
 
-All the source code can be found under ``/scripts``.
+### Directory Structure
 
-Run ``uv sync`` and then run ``uv run .\scripts\<name>.py``.
+- **corpus/**: Contains the document collection used throughout the experiments. The file ``legislature_xvi.ttl`` stores the knowledge graph representing parliamentary initiatives from the XVI Legislature. The file ``initiatives.ttl`` contains the initiative module of the POLIS ontology and is used by ``iaa.py`` to retrieve all subclasses of ``Initiative`` through SPARQL queries.
 
-### Structure
+- **iaa/**: Contains the inter-annotator agreement data. The file ``iaa.csv`` stores the relevance assessments used to measure agreement between human and LLM annotators.
 
-- **qrels.py**: Creates the QRELS files and saves them. Includes the ``train_test_split`` code to divide the QRELS.
+- **qrels/**: Contains the relevance judgments in multiple formats, including ``.trec``, ``.parquet``, and ``.json``. This directory also includes the train/test partitions used in the experiments (``qrels_complete``, ``qrels_test``, and ``qrels_train``).
 
-- **iaa.py**: Creates stratified Query-Initiative pairs and prompts a local Qwen3-8B LLM to evaluate if the initiative is relevant using a structured prompt with all the initiative metadata and text, along with the query's information need and narrative.
+- **queries/**: Contains ``topics.xml``, which defines all information needs in TREC format. Each topic includes a unique identifier, title, description (information need), and narrative (relevance criteria).
 
-- **evaluation.py**: Calculates the metrics used for evaluation using ``ranx``.
+- **runs/**: Contains the baseline retrieval runs in TREC ``.run`` format (BM25, Query Likelihood, TF-IDF, and Vector Search). Since the vector retrieval baseline relies on Faiss HNSW, which introduces non-deterministic behavior, five independent runs are provided to support the computation of averaged effectiveness metrics.
 
-- **cohen.py**: Calculates κ based on the values in ``data/iaa/iaa.csv``, which are created by ``iaa.py``
+## Reproducing the Experiments
 
-- **distribution.ipynb**: Creates the lineplot used in the paper.
+All source code required to reproduce the dataset generation and evaluation procedures is available under the ``scripts/`` directory.
+
+First, install the project dependencies:
+```
+uv sync
+```
+
+Scripts can then be executed using:
+```
+uv run ./scripts/<script_name>.py
+```
+
+### Script Overview
+
+- **qrels.py**: Generates the relevance judgments and exports them to the supported formats. This script also performs the train/test partitioning procedure used in the evaluation.
+
+- **iaa.py**: Generates a stratified sample of query–initiative pairs and prompts a locally hosted Qwen3-8B model to assess relevance. The model receives a structured prompt containing initiative metadata, initiative text, the topic description, and the narrative relevance criteria.
+
+- **evaluation.py**: Computes all retrieval effectiveness metrics reported in the paper using the ``ranx`` evaluation framework.
+
+- **cohen.py**: Computes Cohen's κ coefficient using the annotations stored in ``data/iaa/iaa.csv``.
+
+- **distribution.ipynb**: Produces the collection distribution visualisation presented in the paper.
