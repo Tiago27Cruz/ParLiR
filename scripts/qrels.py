@@ -1,6 +1,10 @@
 from sklearn.model_selection import train_test_split
 from ranx import Qrels
 from statistics import median
+from pathlib import Path
+
+BASE_DIR: Path = Path(__file__).resolve().parent
+OUT_DIR = BASE_DIR / "out"
 
 def split_queries_train_test(test_size=0.2, random_state=42):
     queries_map = get_queries_variations()
@@ -574,9 +578,9 @@ def create_dataset():
     qrels_dict = {}
 
     query_vars = get_queries_variations()
-    #topics = build_trec_topics(query_vars)
-    #with open("out/queries/topics.xml", "w", encoding="utf-8") as f:
-    #    f.write(topics)
+    topics = build_trec_topics(query_vars)
+    with open(OUT_DIR / "topics.xml", "w", encoding="utf-8") as f:
+        f.write(topics)
 
     for num, queries in query_vars.items():
         correct = get_correct_uris(num)
@@ -591,13 +595,13 @@ def create_dataset():
 
     qrels = Qrels(qrels_dict)
     
-    qrels.save("out/qrels_complete.json")
-    qrels.save("out/qrels_complete.trec") 
-    with open("out/qrels_complete.trec", "r", encoding="cp1252") as f:
+    qrels.save("scripts/out/qrels_complete.json")
+    qrels.save("scripts/out/qrels_complete.trec") 
+    with open(OUT_DIR / "qrels_complete.trec", "r", encoding="cp1252") as f:
         content = f.read()
-    with open("out/qrels_complete.trec", "w", encoding="utf-8", newline="\n") as f:
+    with open(OUT_DIR / "qrels_complete.trec", "w", encoding="utf-8", newline="\n") as f:
         f.write(content)
-    qrels.save("out/qrels_complete.parquet")
+    qrels.save("scripts/out/qrels_complete.parquet")
 
     train, test = split_queries_train_test()
     qrels_dict = {}
@@ -613,13 +617,13 @@ def create_dataset():
             qrels_dict[f"{num}-{i}"] = correct_dict
 
     qrels = Qrels(qrels_dict)
-    qrels.save("out/qrels_train.json")
-    qrels.save("out/qrels_train.trec") 
-    with open("out/qrels_train.trec", "r", encoding="cp1252") as f:
+    qrels.save("scripts/out/qrels_train.json")
+    qrels.save("scripts/out/qrels_train.trec") 
+    with open(OUT_DIR / "qrels_train.trec", "r", encoding="cp1252") as f:
         content = f.read()
-    with open("out/qrels_train.trec", "w", encoding="utf-8", newline="\n") as f:
+    with open(OUT_DIR / "qrels_train.trec", "w", encoding="utf-8", newline="\n") as f:
         f.write(content)
-    qrels.save("out/qrels_train.parquet")
+    qrels.save("scripts/out/qrels_train.parquet")
 
     qrels_dict = {}
     for num, queries in test.items():
@@ -633,13 +637,13 @@ def create_dataset():
             qrels_dict[f"{num}-{i}"] = correct_dict
 
     qrels = Qrels(qrels_dict)
-    qrels.save("out/qrels_test.json")
-    qrels.save("out/qrels_test.trec") 
-    with open("out/qrels_test.trec", "r", encoding="cp1252") as f:
+    qrels.save("scripts/out/qrels_test.json")
+    qrels.save("scripts/out/qrels_test.trec") 
+    with open(OUT_DIR / "qrels_test.trec", "r", encoding="cp1252") as f:
         content = f.read()
-    with open("out/qrels_test.trec", "w", encoding="utf-8", newline="\n") as f:
+    with open(OUT_DIR / "qrels_test.trec", "w", encoding="utf-8", newline="\n") as f:
         f.write(content)
-    qrels.save("out/qrels_test.parquet")
+    qrels.save("scripts/out/qrels_test.parquet")
             
 
 def get_median_correct_per_IN():
@@ -648,4 +652,4 @@ def get_median_correct_per_IN():
 
 
 if __name__ == "__main__":
-    get_median_correct_per_IN()
+    create_dataset()
