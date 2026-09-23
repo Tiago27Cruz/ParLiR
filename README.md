@@ -1,5 +1,7 @@
 # ParLiR - A Test Collection for Information Retrieval over Portuguese Parliamentary Initiatives
 
+[![DOI](https://zenodo.org/badge/1357651635.svg)](https://doi.org/10.5281/zenodo.22915661)
+
 Submitted to ECIR2027
 
 ## Dataset
